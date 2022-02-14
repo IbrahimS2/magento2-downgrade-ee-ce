@@ -1,5 +1,4 @@
 -- Enable `entity_id` column for catalog category entity
-DELETE FROM catalog_category_entity WHERE row_id NOT IN (SELECT MAX(row_id) FROM catalog_category_entity GROUP BY entity_id);
 
 ALTER TABLE `catalog_category_entity_datetime`
     ADD COLUMN `entity_id` INT(10) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Entity ID';
@@ -42,19 +41,6 @@ UPDATE `catalog_category_entity_varchar` v INNER JOIN `catalog_category_entity` 
 SET v.`entity_id` = e.`entity_id`
 WHERE 1;
 
--- ----------------
--- Delete entities who are not in catalog_category_entity
--- ----------------
-DELETE FROM `catalog_category_entity_datetime` WHERE row_id NOT IN (SELECT MAX(row_id) FROM catalog_category_entity GROUP BY entity_id) ORDER BY `entity_id` ASC;
-
-DELETE FROM `catalog_category_entity_decimal` WHERE row_id NOT IN (SELECT MAX(row_id) FROM catalog_category_entity GROUP BY entity_id) ORDER BY `entity_id` ASC;
-
-DELETE FROM `catalog_category_entity_int` WHERE row_id NOT IN (SELECT MAX(row_id) FROM catalog_category_entity GROUP BY entity_id) ORDER BY `entity_id` ASC;
-
-DELETE FROM `catalog_category_entity_text` WHERE row_id NOT IN (SELECT MAX(row_id) FROM catalog_category_entity GROUP BY entity_id) ORDER BY `entity_id` ASC;
-
-DELETE FROM `catalog_category_entity_varchar` WHERE row_id NOT IN (SELECT MAX(row_id) FROM catalog_category_entity GROUP BY entity_id) ORDER BY `entity_id` ASC;
-
 -- ------------------------------------------------------------------
 -- Update the `entity_id` relation link for catalog product entity --
 -- ------------------------------------------------------------------
@@ -95,15 +81,11 @@ ALTER TABLE `catalog_category_entity_varchar`
     DROP COLUMN `row_id`;
 
 -- Entity
-SET FOREIGN_KEY_CHECKS = 0;
-ALTER TABLE `catalog_category_entity`
-    DROP FOREIGN KEY `CAT_CTGR_ENTT_ENTT_ID_SEQUENCE_CAT_CTGR_SEQUENCE_VAL`,
-    DROP COLUMN `row_id`,
+ALTER TABLE `catalog_category_entity` DROP FOREIGN KEY `CAT_CTGR_ENTT_ENTT_ID_SEQUENCE_CAT_CTGR_SEQUENCE_VAL`;
+ALTER TABLE `catalog_category_entity`    DROP COLUMN `row_id`,
     DROP COLUMN `created_in`,
-    DROP COLUMN `updated_in`,
-    MODIFY COLUMN `entity_id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Entity ID',
-    ADD PRIMARY KEY (`entity_id`);
-SET FOREIGN_KEY_CHECKS = 1;
+    DROP COLUMN `updated_in`;
+ALTER TABLE `catalog_category_entity` ADD PRIMARY KEY( `entity_id`);
 
 -- Foreign keys
 ALTER TABLE `catalog_category_entity_datetime`
